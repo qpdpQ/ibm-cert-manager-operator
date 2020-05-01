@@ -19,7 +19,7 @@ package certmanager
 import (
 	"context"
 
-	operatorv1alpha1 "github.com/ibm/ibm-cert-manager-operator/pkg/apis/operator/v1alpha1"
+	operatorv1 "github.com/ibm/ibm-cert-manager-operator/pkg/apis/operator/v1"
 	res "github.com/ibm/ibm-cert-manager-operator/pkg/resources"
 
 	admRegv1beta1 "k8s.io/api/admissionregistration/v1beta1"
@@ -33,7 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-func webhookPrereqs(instance *operatorv1alpha1.CertManager, scheme *runtime.Scheme, client client.Client, ns string) error {
+func webhookPrereqs(instance *operatorv1.CertManager, scheme *runtime.Scheme, client client.Client, ns string) error {
 	if err := createRoleBinding(instance, scheme, client); err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func removeWebhookPrereqs(client client.Client, ns string) error {
 	return nil
 }
 
-func apiService(instance *operatorv1alpha1.CertManager, scheme *runtime.Scheme, client client.Client, ns string) error {
+func apiService(instance *operatorv1.CertManager, scheme *runtime.Scheme, client client.Client, ns string) error {
 	apiSvc := &apiRegv1.APIService{}
 	err := client.Get(context.Background(), types.NamespacedName{Name: res.APISvcName, Namespace: ""}, apiSvc)
 	if err != nil && apiErrors.IsNotFound(err) {
@@ -100,7 +100,7 @@ func removeAPIService(client client.Client) error {
 	return nil
 }
 
-func webhooks(instance *operatorv1alpha1.CertManager, scheme *runtime.Scheme, client client.Client) error {
+func webhooks(instance *operatorv1.CertManager, scheme *runtime.Scheme, client client.Client) error {
 	mutating := &admRegv1beta1.MutatingWebhookConfiguration{}
 	err := client.Get(context.Background(), types.NamespacedName{Name: res.CertManagerWebhookName, Namespace: ""}, mutating)
 	if err != nil && apiErrors.IsNotFound(err) {
@@ -159,7 +159,7 @@ func removeWebhooks(client client.Client) error {
 	return nil
 }
 
-func service(instance *operatorv1alpha1.CertManager, scheme *runtime.Scheme, client client.Client, ns string) error {
+func service(instance *operatorv1.CertManager, scheme *runtime.Scheme, client client.Client, ns string) error {
 	svc := &corev1.Service{}
 	err := client.Get(context.Background(), types.NamespacedName{Name: res.CertManagerWebhookName, Namespace: ns}, svc)
 	if err != nil && apiErrors.IsNotFound(err) {
@@ -193,7 +193,7 @@ func removeSvc(client client.Client, ns string) error {
 	return nil
 }
 
-func createRoleBinding(instance *operatorv1alpha1.CertManager, scheme *runtime.Scheme, client client.Client) error {
+func createRoleBinding(instance *operatorv1.CertManager, scheme *runtime.Scheme, client client.Client) error {
 	log.V(2).Info("Creating role binding")
 	roleBinding := &rbacv1.RoleBinding{}
 	err := client.Get(context.Background(), types.NamespacedName{Name: res.CertManagerWebhookName, Namespace: "kube-system"}, roleBinding)

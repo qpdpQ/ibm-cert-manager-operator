@@ -20,7 +20,7 @@ import (
 	"context"
 	"reflect"
 
-	operatorv1alpha1 "github.com/ibm/ibm-cert-manager-operator/pkg/apis/operator/v1alpha1"
+	operatorv1 "github.com/ibm/ibm-cert-manager-operator/pkg/apis/operator/v1"
 	res "github.com/ibm/ibm-cert-manager-operator/pkg/resources"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
@@ -86,7 +86,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to primary resource CertManager
-	err = c.Watch(&source.Kind{Type: &operatorv1alpha1.CertManager{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &operatorv1.CertManager{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -94,7 +94,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource Deployments and requeue the owner CertManager
 	err = c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource ClusterRoles and requeue the owner CertManager
 	err = c.Watch(&source.Kind{Type: &rbacv1.ClusterRole{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -112,7 +112,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource ClusterRoleBindings and requeue the owner CertManager
 	err = c.Watch(&source.Kind{Type: &rbacv1.ClusterRoleBinding{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -121,7 +121,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch for changes to secondary resource ServiceAccounts and requeue the owner CertManager
 	err = c.Watch(&source.Kind{Type: &corev1.ServiceAccount{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -130,7 +130,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch changes to custom resource defintions that are owned by this operator - in case of deletion or changes
 	err = c.Watch(&source.Kind{Type: &apiextensionsAPIv1beta1.CustomResourceDefinition{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -139,7 +139,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch changes to mutating webhook configuration that are owned by this operator - in case of deletion or changes
 	err = c.Watch(&source.Kind{Type: &admRegv1beta1.MutatingWebhookConfiguration{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -147,7 +147,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch changes to validating webhook configuration that are owned by this operator - in case of deletion or changes
 	err = c.Watch(&source.Kind{Type: &admRegv1beta1.ValidatingWebhookConfiguration{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -155,7 +155,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch changes to apiservice that are owned by this operator - in case of deletion or changes
 	err = c.Watch(&source.Kind{Type: &apiRegv1.APIService{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -163,7 +163,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Watch changes to service that are owned by this operator - in case of deletion or changes
 	err = c.Watch(&source.Kind{Type: &corev1.Service{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
-		OwnerType:    &operatorv1alpha1.CertManager{},
+		OwnerType:    &operatorv1.CertManager{},
 	})
 	if err != nil {
 		return err
@@ -195,7 +195,7 @@ func (r *ReconcileCertManager) Reconcile(request reconcile.Request) (reconcile.R
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	reqLogger.Info("Reconciling CertManager")
 	// Fetch the CertManager instance
-	instance := &operatorv1alpha1.CertManager{}
+	instance := &operatorv1.CertManager{}
 	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -276,7 +276,7 @@ func (r *ReconcileCertManager) Reconcile(request reconcile.Request) (reconcile.R
 	return reconcile.Result{}, nil
 }
 
-func (r *ReconcileCertManager) PreReqs(instance *operatorv1alpha1.CertManager) error {
+func (r *ReconcileCertManager) PreReqs(instance *operatorv1.CertManager) error {
 	if err := checkCrds(instance, r.scheme, r.apiextclient.ApiextensionsV1beta1().CustomResourceDefinitions(), instance.Name, instance.Namespace); err != nil {
 		log.V(2).Info("Checking CRDs failed")
 		return err
@@ -288,7 +288,7 @@ func (r *ReconcileCertManager) PreReqs(instance *operatorv1alpha1.CertManager) e
 	return nil
 }
 
-func (r *ReconcileCertManager) deployments(instance *operatorv1alpha1.CertManager) error {
+func (r *ReconcileCertManager) deployments(instance *operatorv1.CertManager) error {
 	if err := certManagerDeploy(instance, r.client, r.kubeclient, r.scheme, r.ns); err != nil {
 		return err
 	}
@@ -329,11 +329,11 @@ func (r *ReconcileCertManager) deployments(instance *operatorv1alpha1.CertManage
 	return nil
 }
 
-func (r *ReconcileCertManager) updateEvent(instance *operatorv1alpha1.CertManager, message, event, reason string) {
+func (r *ReconcileCertManager) updateEvent(instance *operatorv1.CertManager, message, event, reason string) {
 	r.recorder.Event(instance, event, reason, message)
 }
 
-func (r *ReconcileCertManager) updateStatus(instance *operatorv1alpha1.CertManager, message string) {
+func (r *ReconcileCertManager) updateStatus(instance *operatorv1.CertManager, message string) {
 	if !reflect.DeepEqual(instance.Status.OverallStatus, message) {
 		instance.Status.OverallStatus = message
 		if err := r.client.Status().Update(context.TODO(), instance); err != nil {

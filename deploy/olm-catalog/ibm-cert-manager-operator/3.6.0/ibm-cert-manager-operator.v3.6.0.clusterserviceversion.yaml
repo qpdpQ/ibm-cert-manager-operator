@@ -5,7 +5,7 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "operator.ibm.com/v1alpha1",
+          "apiVersion": "operator.ibm.com/v1",
           "kind": "CertManager",
           "metadata": {
             "labels": {
@@ -117,7 +117,69 @@ spec:
         path: certManagerStatus
         x-descriptors:
         - 'urn:alm:descriptor:com.tectonic.ui:podStatuses'
-      version: v1alpha1
+      displayName: CertManager V1
+      resources:
+      - kind: Deployment
+        name: ''
+        version: v1
+      - kind: ClusterRole
+        name: clusterroles.rbac.authorization.k8s.io
+        version: v1
+      - kind: ClusterRoleBinding
+        name: clusterrolebindings.rbac.authorization.k8s.io
+        version: v1
+      - kind: CustomResourceDefinition
+        name: customresourcedefinitions.apiextensions.k8s.io
+        version: v1beta1
+      - kind: ServiceAccount
+        name: ''
+        version: v1
+      - kind: ValidatingWebhookConfiguration
+        name: validatingwebhookconfigurations.admissionregistration.k8s.io
+        version: v1beta1
+      - kind: MutatingWebhookConfiguration
+        name: mutatingwebhookconfigurations.admissionregistration.k8s.io
+        version: v1beta1
+      - kind: Service
+        name: ''
+        version: v1
+      - kind: APIService
+        name: apiservices.apiregistration.k8s.io
+        version: v1
+      specDescriptors:
+      - description: Disables the use of hostNetwork by the webhook
+        displayName: DisableHostNetwork
+        path: disableHostNetwork
+        x-descriptors:
+        - 'urn:alm:descriptor:com.tectonic.ui:text'
+      - description: Enables the webhook component of cert-manager when set to true
+        displayName: EnableWebhook
+        path: enableWebhook
+        x-descriptors:
+        - 'urn:alm:descriptor:com.tectonic.ui:text'
+      - description: Appends the text to the image tag when it deploys cert-manager
+        displayName: ImagePostFix
+        path: imagePostFix
+        x-descriptors:
+        - 'urn:alm:descriptor:com.tectonic.ui:text'
+      - description: Sets the image registry to this when deploying cert-manager
+        displayName: ImageRegistry
+        path: imageRegistry
+        x-descriptors:
+        - 'urn:alm:descriptor:com.tectonic.ui:text'
+      - description: The namespace where namespace scoped resources referenced by cert-manager clusterissuers must be placed
+        displayName: ResourceNamespace
+        path: resourceNamespace
+        x-descriptors:
+        - 'urn:alm:descriptor:com.tectonic.ui:text'
+      version: v1
+    - description: CertManager is the Schema for the certmanagers API
+      kind: CertManager
+      name: certmanagers.operator.ibm.com
+      statusDescriptors:
+      - description: It will be as "OK when all objects are created successfully
+        displayName: CertManager Status
+        path: certManagerStatus
       displayName: CertManager
       resources:
       - kind: Deployment
@@ -173,6 +235,7 @@ spec:
         path: resourceNamespace
         x-descriptors:
         - 'urn:alm:descriptor:com.tectonic.ui:text'
+      version: v1alpha1
   description: Operator for managing deployment of cert-manager service.
   displayName: Ibm Cert Manager Operator
   install:
@@ -427,6 +490,14 @@ spec:
           - subjectaccessreviews
           verbs:
           - '*'
+        - apiGroups:
+          - operators.open-cluster-management.io
+          resources:
+          - multiclusterhubs
+          verbs:
+          - get
+          - list
+          - watch
         serviceAccountName: ibm-cert-manager-operator
       deployments:
       - name: ibm-cert-manager-operator
