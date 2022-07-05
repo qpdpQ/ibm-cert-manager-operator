@@ -410,7 +410,8 @@ func (r *CertManagerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return nil
 }
 
-func (r *CertManagerReconciler) CreateOrUpdateFromYaml(yamlContent []byte, alwaysUpdate ...bool) error {
+// use yaml file to generate objects
+func (r *CertManagerReconciler) CreateFromYaml(yamlContent []byte, alwaysUpdate ...bool) error {
 	objects, err := YamlToObjects(yamlContent)
 	if err != nil {
 		return err
@@ -473,13 +474,14 @@ func (r *CertManagerReconciler) UpdateObject(obj *unstructured.Unstructured) err
 	return nil
 }
 
-// createCertManagerV1Crds
+// create CertManagerV1 Crds
 func (r *CertManagerReconciler) CreateV1CRDs() error {
+	klog.Infof("Creating CertManager CRDs")
 	CRDs := []string{
 		certificaterequestsCRD, certificatesCRD, clusterissuersCRD, issuersCRD, ordersCRD, challengesCRD,
 	}
 	for _, CRD := range CRDs {
-		if err := r.CreateOrUpdateFromYaml([]byte(CRD)); err != nil {
+		if err := r.CreateFromYaml([]byte(CRD)); err != nil {
 			return err
 		}
 	}
