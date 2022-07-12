@@ -47,7 +47,7 @@ spec:
       hostPID: false
       containers:
         - name: manager
-          image: icr.io/cpopen/ibm-cert-manager-operator:latest
+          image: quay.io/yuchen_li1/ibm-cert-manager-operator-amd64@sha256:0c2fd4df093c5331b8d743420b747f4c045471576deae3a923b81e79a2bf1014
           command:
           - ibm-cert-manager-operator
           imagePullPolicy: Always
